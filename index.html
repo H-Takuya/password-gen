@@ -47,6 +47,21 @@
       cursor: pointer;
       margin-left: 1rem;
     }
+    .copy-toast {
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #03a9f4;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .copy-toast.show {
+      opacity: 1;
+    }
     button {
       margin-top: 1rem;
       padding: 0.5rem 1rem;
@@ -85,7 +100,17 @@
   <div id="passwordContainer"></div>
   <div class="history" id="history"></div>
 
+  <div id="toast" class="copy-toast">コピーしました</div>
+
   <script>
+    function showToast() {
+      const toast = document.getElementById("toast");
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 1500);
+    }
+
     function generatePasswords() {
       const passwordContainer = document.getElementById("passwordContainer");
       passwordContainer.innerHTML = "";
@@ -103,7 +128,7 @@
         copyBtn.className = "copy-icon";
         copyBtn.onclick = () => {
           navigator.clipboard.writeText(password).then(() => {
-            alert("コピーしました: " + password);
+            showToast();
           });
         };
 
@@ -159,3 +184,4 @@
   </script>
 </body>
 </html>
+
