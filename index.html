@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Password-gen</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #121212;
+      color: #fff;
+      padding: 2rem;
+      max-width: 600px;
+      margin: auto;
+    }
+    .settings {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .settings label {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    input[type="number"] {
+      width: 60px;
+    }
+    .password-entry {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #222;
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 5px;
+      font-size: 1.2rem;
+      word-break: break-all;
+    }
+    .copy-icon {
+      background: none;
+      border: none;
+      color: #03a9f4;
+      font-size: 1.2rem;
+      cursor: pointer;
+      margin-left: 1rem;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: #03a9f4;
+      border: none;
+      color: #fff;
+      border-radius: 5px;
+    }
+    .history {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+    .history-item {
+      background: #333;
+      margin: 0.2rem 0;
+      padding: 0.3rem;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Password-gen</h1>
+
+  <div class="settings">
+    <label>文字数:<input type="number" id="length" min="4" max="64" value="10"></label>
+    <label><input type="checkbox" id="includeNumbers" checked> 数字</label>
+    <label><input type="checkbox" id="includeSymbols" checked> 記号</label>
+    <label><input type="checkbox" id="includeUppercase" checked> 大文字</label>
+    <label><input type="checkbox" id="includeLowercase" checked> 小文字</label>
+  </div>
+
+  <button onclick="generatePasswords()">5個生成する</button>
+
+  <div id="passwordContainer"></div>
+  <div class="history" id="history"></div>
+
+  <script>
+    function generatePasswords() {
+      const passwordContainer = document.getElementById("passwordContainer");
+      passwordContainer.innerHTML = "";
+      for (let i = 0; i < 5; i++) {
+        const password = generatePassword();
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "password-entry";
+
+        const pwSpan = document.createElement("span");
+        pwSpan.textContent = password;
+
+        const copyBtn = document.createElement("button");
+        copyBtn.innerHTML = "📋";
+        copyBtn.className = "copy-icon";
+        copyBtn.onclick = () => {
+          navigator.clipboard.writeText(password).then(() => {
+            alert("コピーしました: " + password);
+          });
+        };
+
+        wrapper.appendChild(pwSpan);
+        wrapper.appendChild(copyBtn);
+        passwordContainer.appendChild(wrapper);
+
+        addToHistory(password);
+      }
+    }
+
+    function generatePassword() {
+      const length = parseInt(document.getElementById("length").value);
+      const includeNumbers = document.getElementById("includeNumbers").checked;
+      const includeSymbols = document.getElementById("includeSymbols").checked;
+      const includeUppercase = document.getElementById("includeUppercase").checked;
+      const includeLowercase = document.getElementById("includeLowercase").checked;
+
+      const numbers = '0123456789';
+      const symbols = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+      const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+      const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+      let chars = '';
+      if (includeNumbers) chars += numbers;
+      if (includeSymbols) chars += symbols;
+      if (includeLowercase) chars += lowercase;
+      if (includeUppercase) chars += uppercase;
+
+      if (chars === '') {
+        alert('1つ以上の文字種を選択してください');
+        return '';
+      }
+
+      let password = '';
+      for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * chars.length);
+        password += chars[randomIndex];
+      }
+      return password;
+    }
+
+    function addToHistory(password) {
+      const historyDiv = document.getElementById("history");
+      const item = document.createElement("div");
+      item.className = "history-item";
+      item.textContent = password;
+      historyDiv.prepend(item);
+      if (historyDiv.childElementCount > 20) {
+        historyDiv.removeChild(historyDiv.lastChild);
+      }
+    }
+  </script>
+</body>
+</html>
